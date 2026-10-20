@@ -1093,7 +1093,8 @@ bool AP_Periph_FW::canard_broadcast(uint64_t data_type_signature,
                                     uint8_t priority,
                                     const void* payload,
                                     uint16_t payload_len,
-                                    uint8_t iface_mask)
+                                    uint8_t iface_mask,
+                                    uint32_t timeout_us)
 {
     WITH_SEMAPHORE(canard_broadcast_semaphore);
     const bool is_dna = data_type_id == UAVCAN_PROTOCOL_DYNAMIC_NODE_ID_ALLOCATION_ID;
@@ -1118,7 +1119,7 @@ bool AP_Periph_FW::canard_broadcast(uint64_t data_type_signature,
 #if CANARD_ENABLE_CANFD
         .canfd = is_dna? false : canfdout(),
 #endif
-        .deadline_usec = AP_HAL::micros64()+CAN_FRAME_TIMEOUT,
+        .deadline_usec = AP_HAL::micros64()+timeout_us,
 #if CANARD_MULTI_IFACE
         .iface_mask = iface_mask==0 ? uint8_t(IFACE_ALL) : iface_mask,
 #endif
@@ -1197,7 +1198,15 @@ void AP_Periph_FW::processTx(void)
         // push message with 1s timeout
         bool sent = true;
         const uint64_t now_us = AP_HAL::micros64();
-        const uint64_t deadline = now_us + 1000000U;
+        uint64_t deadline = now_us + 1000000U;
+#if CANARD_ENABLE_DEADLINE
+        // Preserve the transfer deadline when handing frames to the HAL queue.
+        deadline = MIN(deadline, txf->deadline_usec);
+        if (deadline <= now_us) {
+            canardPopTxQueue(&dronecan.canard);
+            continue;
+        }
+#endif
         // try sending to all interfaces
         for (auto &_ins : instances) {
             if (_ins.iface == NULL) {

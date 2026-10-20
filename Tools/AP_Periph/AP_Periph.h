@@ -547,7 +547,8 @@ public:
                           uint8_t priority,
                           const void* payload,
                           uint16_t payload_len,
-                          uint8_t iface_mask=0);
+                          uint8_t iface_mask=0,
+                          uint32_t timeout_us=1000000U);
 
     bool canard_respond(CanardInstance* canard_instance,
                         CanardRxTransfer* transfer,

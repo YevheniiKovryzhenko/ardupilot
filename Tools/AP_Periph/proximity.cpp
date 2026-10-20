@@ -7,6 +7,27 @@
  */
 
 #include <dronecan_msgs.h>
+#if AP_PROXIMITY_SF45_CAN_ENABLED && AP_PROXIMITY_LIGHTWARE_SF45B_ENABLED
+#include <AP_Proximity/AP_Proximity_LightWareSF45B.h>
+
+// Local wire contract: flag bit 0 identifies raw SF45 sensor-frame observations.
+// Legacy Proximity packets use flags=0 and body-frame boundary obstacles.
+static void publish_sf45_sample(float yaw, uint16_t distance_cm)
+{
+    ardupilot_equipment_proximity_sensor_Proximity pkt {};
+    pkt.sensor_id = periph.proximity.get_address(0);
+    pkt.flags = 1;
+    pkt.reading_type = ARDUPILOT_EQUIPMENT_PROXIMITY_SENSOR_PROXIMITY_READING_TYPE_GOOD;
+    pkt.yaw = yaw;
+    // Keep no-return distinct across float16 quantization near 50 metres.
+    pkt.distance = distance_cm > 5000 ? 51.0f : distance_cm * 0.01f;
+    uint8_t buffer[ARDUPILOT_EQUIPMENT_PROXIMITY_SENSOR_PROXIMITY_MAX_SIZE];
+    const uint16_t size = ardupilot_equipment_proximity_sensor_Proximity_encode(&pkt, buffer, !periph.canfdout());
+    periph.canard_broadcast(ARDUPILOT_EQUIPMENT_PROXIMITY_SENSOR_PROXIMITY_SIGNATURE,
+                           ARDUPILOT_EQUIPMENT_PROXIMITY_SENSOR_PROXIMITY_ID,
+                           CANARD_TRANSFER_PRIORITY_LOW, buffer, size, 0, 20000U);
+}
+#endif
 
 void AP_Periph_FW::can_proximity_update()
 {
@@ -14,6 +35,17 @@ void AP_Periph_FW::can_proximity_update()
         return;
     }
 
+#if AP_PROXIMITY_SF45_CAN_ENABLED && AP_PROXIMITY_LIGHTWARE_SF45B_ENABLED
+    if (proximity.get_type(0) == AP_Proximity::Type::SF45B) {
+        auto *backend = static_cast<AP_Proximity_LightWareSF45B *>(proximity.get_backend(0));
+        if (backend != nullptr) {
+            backend->set_sample_callback(publish_sf45_sample);
+        }
+        // Poll at the main-loop rate, independent of coarse proximity publication.
+        proximity.update();
+        return;
+    }
+#endif
     uint32_t now = AP_HAL::millis();
     static uint32_t last_update_ms;
     if (g.proximity_max_rate > 0 &&

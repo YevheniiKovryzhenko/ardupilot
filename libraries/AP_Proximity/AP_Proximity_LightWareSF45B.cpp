@@ -138,6 +138,12 @@ void AP_Proximity_LightWareSF45B::process_message()
         if (!_init_complete || (_payload_recv != (PROXIMITY_SF45B_DESIRED_FIELD_COUNT * 2))) {
             break;
         }
+#if AP_PROXIMITY_SF45_CAN_ENABLED
+        if (_sample_callback != nullptr) {
+            _sample_callback(int16_t(UINT16_VALUE(_msg.payload[3], _msg.payload[2])) * 0.01f,
+                             UINT16_VALUE(_msg.payload[1], _msg.payload[0]));
+        }
+#endif
         _last_distance_received_ms = AP_HAL::millis();
         const float distance_m = _distance_filt.apply((int16_t)UINT16_VALUE(_msg.payload[1], _msg.payload[0])) * 0.01f;
         const float angle_deg = correct_angle_for_orientation((int16_t)UINT16_VALUE(_msg.payload[3], _msg.payload[2]) * 0.01f);

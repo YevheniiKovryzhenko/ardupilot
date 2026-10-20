@@ -66,3 +66,6 @@ define HAL_PROXIMITY_ENABLED 1
 # ----------- rangefinder
 define AP_PERIPH_RANGEFINDER_ENABLED 1
 
+
+# Preserve sensor-frame SF45 observations for PX4 instead of coarse boundary sectors.
+define AP_PROXIMITY_SF45_CAN_ENABLED 1

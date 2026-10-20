@@ -35,7 +35,15 @@ public:
     float distance_max_m() const override { return 50.0f; }
     float distance_min_m() const override { return 0.20f; }
 
+#if AP_PROXIMITY_SF45_CAN_ENABLED
+    // Raw, sensor-frame observations; callback runs only for newly parsed packets.
+    void set_sample_callback(void (*callback)(float, uint16_t)) { _sample_callback = callback; }
+#endif
+
 private:
+#if AP_PROXIMITY_SF45_CAN_ENABLED
+    void (*_sample_callback)(float, uint16_t) = nullptr;
+#endif
 
     // message ids
     enum class MessageID : uint8_t {
