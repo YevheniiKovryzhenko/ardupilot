@@ -61,6 +61,10 @@ void AP_Periph_FW::can_airspeed_update(void)
 
     // populate the elements we have
     pkt.differential_pressure = press;
+    // This is the pressure transducer's own temperature. Keep the canonical
+    // field populated, and also mirror it to static_air_temperature because
+    // PX4's current DroneCAN differential-pressure bridge reads that field.
+    pkt.differential_pressure_sensor_temperature = temp;
     pkt.static_air_temperature = temp;
 
     // if a Pitot tube temperature sensor is available, use it

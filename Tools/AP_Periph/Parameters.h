@@ -5,11 +5,15 @@
 
 #define AP_PARAM_VEHICLE_NAME periph
 
+#ifndef AP_PERIPH_PARAM_FORMAT_VERSION
+#define AP_PERIPH_PARAM_FORMAT_VERSION 2
+#endif
+
 // Global parameter class.
 //
 class Parameters {
 public:
-    static const uint16_t k_format_version = 2;
+    static const uint16_t k_format_version = AP_PERIPH_PARAM_FORMAT_VERSION;
 
     enum {
         // Layout version number, always key zero.

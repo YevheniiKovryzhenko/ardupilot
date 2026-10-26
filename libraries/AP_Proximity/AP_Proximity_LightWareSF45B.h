@@ -81,9 +81,6 @@ private:
     // initialise sensor
     void initialise();
 
-    // request start of streaming of distances
-    void request_stream_start();
-
     // check and process replies from sensor
     void process_replies();
 
@@ -94,9 +91,20 @@ private:
     uint8_t convert_angle_to_minisector(float angle_deg) const;
 
     // internal variables
-    uint32_t _last_init_ms;                 // system time of last re-initialisation
-    uint32_t _last_distance_received_ms;    // system time of last distance measurement received from sensor
-    bool _init_complete;                    // true once sensor initialisation is complete
+    enum class ConfigState : uint8_t {
+        NEED_PRODUCT_NAME,
+        WAIT_PRODUCT_NAME,
+        NEED_UPDATE_RATE,
+        WAIT_UPDATE_RATE,
+        NEED_DISTANCE_OUTPUT,
+        WAIT_DISTANCE_OUTPUT,
+        NEED_STREAM,
+        WAIT_STREAM,
+        STREAMING,
+    };
+    ConfigState _config_state = ConfigState::NEED_PRODUCT_NAME;
+    uint32_t _last_config_request_ms = 0;
+    uint32_t _last_distance_received_ms = 0; // system time of last distance measurement received from sensor
     ModeFilterInt16_Size3 _distance_filt{1};// mode filter to reduce glitches
 
     // 3D boundary face and distance for latest readings
@@ -110,13 +118,6 @@ private:
     float _minisector_distance;             // shortest distance (in meters) in mini sector
     float _minisector_angle;                // angle (in degrees) of shortest distance in mini sector
     bool _minisector_distance_valid;        // true if mini sector has at least one valid distance
-
-    // state of sensor
-    struct {
-        uint8_t update_rate;        // sensor reported update rate enum from UPDATE_RATE message
-        uint32_t streaming_fields;  // sensor reported bitmask of fields sent in DISTANCE_DATA_CM message
-        uint32_t stream_data_type;  // sensor reported stream value.  5 if DISTANCE_DATA_CM messages are being streamed
-    } _sensor_state;
 
 };
 

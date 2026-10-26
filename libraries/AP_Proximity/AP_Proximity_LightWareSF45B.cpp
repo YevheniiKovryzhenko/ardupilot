@@ -29,10 +29,12 @@
 extern const AP_HAL::HAL& hal;
 
 static const uint32_t PROXIMITY_SF45B_TIMEOUT_MS = 200;
-static const uint32_t PROXIMITY_SF45B_REINIT_INTERVAL_MS = 5000;    // re-initialise sensor after this many milliseconds
+static const uint32_t PROXIMITY_SF45B_CONFIG_RETRY_MS = 500;
 static const float PROXIMITY_SF45B_COMBINE_READINGS_DEG = 5.0f;     // combine readings from within this many degrees to improve efficiency
 static const uint32_t PROXIMITY_SF45B_STREAM_DISTANCE_DATA_CM = 5;
-static const uint8_t PROXIMITY_SF45B_DESIRED_UPDATE_RATE = 6;       // 1:48hz, 2:55hz, 3:64hz, 4:77hz, 5:97hz, 6:129hz, 7:194hz, 8:388hz
+// Match PX4's SF45 serial driver default and SF45/B Product Guide Rev. 3:
+// update-rate code 5 is 500 readings/s.
+static const uint8_t PROXIMITY_SF45B_DESIRED_UPDATE_RATE = 5;
 static const uint32_t PROXIMITY_SF45B_DESIRED_FIELDS = ((uint32_t)1 << 0 | (uint32_t)1 << 8);   // first return (unfiltered), yaw angle
 static const uint16_t PROXIMITY_SF45B_DESIRED_FIELD_COUNT = 2;      // DISTANCE_DATA_CM message should contain two fields
 
@@ -43,11 +45,11 @@ void AP_Proximity_LightWareSF45B::update(void)
         return;
     }
 
-    // initialise sensor if necessary
-    initialise();
-
     // process incoming messages
     process_replies();
+
+    // Initialize the sensor in the same request/acknowledgment order as PX4.
+    initialise();
 
     // check for timeout and set health status
     if ((_last_distance_received_ms == 0) || ((AP_HAL::millis() - _last_distance_received_ms) > PROXIMITY_SF45B_TIMEOUT_MS)) {
@@ -60,33 +62,44 @@ void AP_Proximity_LightWareSF45B::update(void)
 // initialise sensor
 void AP_Proximity_LightWareSF45B::initialise()
 {
-    // check sensor is configured correctly
-    _init_complete = (_sensor_state.stream_data_type == PROXIMITY_SF45B_STREAM_DISTANCE_DATA_CM) &&
-                     (_sensor_state.update_rate == PROXIMITY_SF45B_DESIRED_UPDATE_RATE) &&
-                     (_sensor_state.streaming_fields == PROXIMITY_SF45B_DESIRED_FIELDS);
-
-    // exit if initialisation requests have been sent within the last few seconds
     uint32_t now_ms = AP_HAL::millis();
-    if ((now_ms - _last_init_ms) < PROXIMITY_SF45B_REINIT_INTERVAL_MS) {
+    if (_config_state == ConfigState::STREAMING ||
+        now_ms - _last_config_request_ms < PROXIMITY_SF45B_CONFIG_RETRY_MS) {
         return;
     }
-    _last_init_ms = now_ms;
 
-    // request stream rate and contents
-    request_stream_start();
-}
-
-// request start of streaming of distances
-void AP_Proximity_LightWareSF45B::request_stream_start()
-{
-    // request output rate
-    send_message((uint8_t)MessageID::UPDATE_RATE, true, &PROXIMITY_SF45B_DESIRED_UPDATE_RATE, sizeof(PROXIMITY_SF45B_DESIRED_UPDATE_RATE));
-
-    // request first return (unfiltered), and yaw angle
-    send_message((uint8_t)MessageID::DISTANCE_OUTPUT, true, (const uint8_t*)&PROXIMITY_SF45B_DESIRED_FIELDS, sizeof(PROXIMITY_SF45B_DESIRED_FIELDS));
-
-    // request start streaming of DISTANCE_DATA_CM messages
-    send_message((uint8_t)MessageID::STREAM, true, (const uint8_t*)&PROXIMITY_SF45B_STREAM_DISTANCE_DATA_CM, sizeof(PROXIMITY_SF45B_STREAM_DISTANCE_DATA_CM));
+    // The SF45 replies to every request. Wait for each matching reply before
+    // sending the next configuration command, as PX4's working driver does.
+    switch (_config_state) {
+    case ConfigState::NEED_PRODUCT_NAME:
+    case ConfigState::WAIT_PRODUCT_NAME:
+        send_message((uint8_t)MessageID::PRODUCT_NAME, false, nullptr, 0);
+        _config_state = ConfigState::WAIT_PRODUCT_NAME;
+        break;
+    case ConfigState::NEED_UPDATE_RATE:
+    case ConfigState::WAIT_UPDATE_RATE:
+        send_message((uint8_t)MessageID::UPDATE_RATE, true, &PROXIMITY_SF45B_DESIRED_UPDATE_RATE,
+                     sizeof(PROXIMITY_SF45B_DESIRED_UPDATE_RATE));
+        _config_state = ConfigState::WAIT_UPDATE_RATE;
+        break;
+    case ConfigState::NEED_DISTANCE_OUTPUT:
+    case ConfigState::WAIT_DISTANCE_OUTPUT:
+        send_message((uint8_t)MessageID::DISTANCE_OUTPUT, true,
+                     (const uint8_t *)&PROXIMITY_SF45B_DESIRED_FIELDS,
+                     sizeof(PROXIMITY_SF45B_DESIRED_FIELDS));
+        _config_state = ConfigState::WAIT_DISTANCE_OUTPUT;
+        break;
+    case ConfigState::NEED_STREAM:
+    case ConfigState::WAIT_STREAM:
+        send_message((uint8_t)MessageID::STREAM, true,
+                     (const uint8_t *)&PROXIMITY_SF45B_STREAM_DISTANCE_DATA_CM,
+                     sizeof(PROXIMITY_SF45B_STREAM_DISTANCE_DATA_CM));
+        _config_state = ConfigState::WAIT_STREAM;
+        break;
+    case ConfigState::STREAMING:
+        break;
+    }
+    _last_config_request_ms = now_ms;
 }
 
 // check for replies from sensor
@@ -116,26 +129,38 @@ void AP_Proximity_LightWareSF45B::process_message()
     switch ((MessageID)_msg.msgid) {
 
     case MessageID::DISTANCE_OUTPUT:
-        if (_payload_recv == sizeof(uint32_t)) {
-            _sensor_state.streaming_fields = UINT32_VALUE(_msg.payload[3], _msg.payload[2], _msg.payload[1], _msg.payload[0]);
+        if (_config_state == ConfigState::WAIT_DISTANCE_OUTPUT &&
+            _payload_recv == sizeof(uint32_t) &&
+            UINT32_VALUE(_msg.payload[3], _msg.payload[2], _msg.payload[1], _msg.payload[0]) == PROXIMITY_SF45B_DESIRED_FIELDS) {
+            _config_state = ConfigState::NEED_STREAM;
         }
         break;
 
     case MessageID::STREAM:
-        if (_payload_recv == sizeof(uint32_t)) {
-            _sensor_state.stream_data_type = UINT32_VALUE(_msg.payload[3], _msg.payload[2], _msg.payload[1], _msg.payload[0]);
+        if (_config_state == ConfigState::WAIT_STREAM &&
+            _payload_recv == sizeof(uint32_t) &&
+            UINT32_VALUE(_msg.payload[3], _msg.payload[2], _msg.payload[1], _msg.payload[0]) == PROXIMITY_SF45B_STREAM_DISTANCE_DATA_CM) {
+            _config_state = ConfigState::STREAMING;
         }
         break;
 
     case MessageID::UPDATE_RATE:
-        if (_payload_recv == 1) {
-            _sensor_state.update_rate = _msg.payload[0];
+        if (_config_state == ConfigState::WAIT_UPDATE_RATE && _payload_recv == 1 &&
+            _msg.payload[0] == PROXIMITY_SF45B_DESIRED_UPDATE_RATE) {
+            _config_state = ConfigState::NEED_DISTANCE_OUTPUT;
+        }
+        break;
+
+    case MessageID::PRODUCT_NAME:
+        if (_config_state == ConfigState::WAIT_PRODUCT_NAME && _payload_recv == 16) {
+            _config_state = ConfigState::NEED_UPDATE_RATE;
         }
         break;
 
     case MessageID::DISTANCE_DATA_CM: {
-        // ignore distance messages until initialisation is complete
-        if (!_init_complete || (_payload_recv != (PROXIMITY_SF45B_DESIRED_FIELD_COUNT * 2))) {
+        // Ignore distance data until all configuration acknowledgments arrive.
+        if (_config_state != ConfigState::STREAMING ||
+            _payload_recv != (PROXIMITY_SF45B_DESIRED_FIELD_COUNT * 2)) {
             break;
         }
 #if AP_PROXIMITY_SF45_CAN_ENABLED

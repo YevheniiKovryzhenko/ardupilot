@@ -102,9 +102,9 @@ or using DroneCAN GUI Tools.
 ## Matek CAN-G474 SF45/B to PX4
 
 This section contains the complete ArduPilot-side instructions for the
-LightWare SF45/B to PX4 DroneCAN integration: build and update the CAN-G474
-AP_Periph image, configure the sensor UART and node ID, and confirm the paired
-PX4 link. PX4 build and receiver parameters are documented in the PX4 checkout
+Matek CAN-G474 sensor node: build and update its AP_Periph image, use the SF45/B
+DroneCAN link to PX4, and configure the default GPS and ASPD-4525 airspeed
+inputs. PX4 build and receiver parameters are documented in the PX4 checkout
 at `src/drivers/distance_sensor/lightware_sf45_can/README.md`.
 
 The CAN-G474 must run the modified `MatekG474-Periph` image. Stock AP_Periph on
@@ -145,8 +145,65 @@ reports success, then power-cycle it.
 If you do not have a USB-to-CAN adapter, the Cube Orange+ can serve this image
 over its connected CAN bus. This requires a working AP_Periph CAN bootloader;
 it does not install or recover that bootloader. Follow “Update AP_Periph over
-CAN using PX4” in `src/drivers/distance_sensor/lightware_sf45_can/README.md`
-in the PX4 checkout for the SD-card and `UAVCAN_ENABLE` steps.
+CAN using PX4” below. This path uses PX4's built-in firmware server and the
+Cube's microSD card; it does not require DroneCAN GUI Tool on the computer.
+
+#### Use PX4 as the CAN firmware server
+
+1. Copy `build/MatekG474-Periph/bin/AP_Periph.bin` to the root of the Cube
+   Orange+'s microSD card, then reinstall the card.
+2. In PX4, set `UAVCAN_ENABLE=2`, keep `UAVCAN_BITRATE=1000000`, save, and
+   reboot. Mode 2 enables PX4's DroneCAN firmware server. It does not route
+   motor outputs over CAN. See the PX4 guide linked above for the other PX4
+   receiver settings.
+3. PX4 identifies this image as MatekG474 board ID `1170`, moves it to
+   `/fs/microsd/ufw/1170.bin`, and serves it to connected nodes with that board
+   ID when their image CRC differs. If the update does not start by itself,
+   run `uavcan update` in the PX4 MAVLink Console.
+4. Wait for the Matek node to reboot and reappear in `uavcan status`. PX4 may
+   update every online MatekG474 node with a different image CRC, so disconnect
+   other such nodes if you do not want them updated. Keep the intended image
+   as `/fs/microsd/ufw/1170.bin`.
+5. After updating, set `UAVCAN_ENABLE=1` and reboot if you want PX4 back in
+   manual/static sensor mode. Mode 1 still receives sensors and supports
+   remote AP_Periph parameter commands; mode 2 is needed for firmware updates.
+
+The Matek must already have a working AP_Periph CAN bootloader. PX4 cannot
+install or recover a missing bootloader. Use the DFU/combined HEX procedure
+below for initial bootloader installation or recovery.
+
+#### Use an ArduPilot flight controller as a USB-to-CAN adapter
+
+An ArduPilot flight controller can bridge the computer's USB connection to
+its CAN bus using SLCAN, so a separate USB-to-CAN adapter is not needed. These
+settings are for the flight controller acting as the bridge, not for the
+Matek CAN-G474 AP_Periph node. The flight controller must support SLCAN and
+have a CAN connector wired to the same powered, terminated 1 Mbit/s bus.
+
+1. Connect Mission Planner to the ArduPilot flight controller. In its full
+   parameter list, set `CAN_P1_DRIVER=1`, `CAN_D1_PROTOCOL=1`,
+   `CAN_P1_BITRATE=1000000`, and `CAN_SLCAN_CPORT=1`. Write the parameters and
+   reboot. These enable the first CAN port for DroneCAN and select it for
+   SLCAN passthrough.
+2. Reconnect Mission Planner and set `CAN_SLCAN_SERNUM=0` and
+   `CAN_SLCAN_TIMOUT=0`. `SERNUM=0` routes SLCAN to Serial0, normally the USB
+   connection; it is cleared at boot, so do not reboot after setting it.
+   In Mission Planner's **Initial Setup > Optional Hardware > UAVCAN
+   (DroneCAN)** page, click **SLCAN Mode CAN1** to start the passthrough.
+3. Close/disconnect Mission Planner so it releases the USB COM port, but leave
+   the USB cable connected. Open DroneCAN GUI Tool and select the flight
+   controller's USB COM port. Use a CAN bitrate of `1000000`; `115200` is a
+   suitable adapter baud setting for the virtual USB serial connection.
+   Enable **Local node ID** using the tool's Set/check control, and choose an
+   ID that does not conflict with another node.
+4. The connected nodes should appear in the GUI. Select the Matek node and
+   use its firmware update action to load
+   `build/MatekG474-Periph/bin/AP_Periph.bin`. Keep the node powered until the
+   updater reports completion, then wait for it to restart.
+
+ArduPilot documents the board-specific SLCAN setup in [SLCAN Access on F4
+based Autopilots](https://ardupilot.org/copter/docs/common-slcan-f4.html) and
+the GUI connection in [DroneCAN GUI](https://ardupilot.org/copter/docs/common-uavcan-gui.html).
 
 This uses the node's installed AP_Periph CAN bootloader. For initial bootloader
 installation or recovery, use Matek's CAN-G474 DFU procedure and the generated
@@ -165,59 +222,61 @@ has the SF45 publisher PX4 expects.
 ### Connect and configure the sensors
 
 Connect CAN-H, CAN-L and common ground to a PX4 CAN port. Use classic CAN at
-1 Mbit/s and terminate the bus at its two physical ends. The board's default
-UART assignments are port 1 for RC, port 2 for GPS, port 3 for MSP, and port 4
-for a rangefinder. This example retains GPS and rangefinder on their default
-ports and connects SF45 to USART3, serial port 3 (MCU PB10/TX and PB11/RX).
-Cross TX/RX and share signal ground. USART3 is marked `NODMA` but is suitable
-for this stream. Set `MSP_PORT=-1` to release port 3 from its default MSP use.
+1 Mbit/s and terminate the bus at its two physical ends. The board maps USART1
+to UART1, USART2 to UART2/GPS, USART3 to UART3/MSP, and UART4 to the rangefinder
+port. This image uses UART1 for SF45/B, UART2 for GPS, and UART4 for US-D1; the
+unrelated peripheral feature families remain disabled. Matek labels the UART
+signals T1/R1, T2/R2, and T4/R4.
+See the [Matek CAN-G474 product pinout](https://www.mateksys.com/?portfolio=can-g474).
 
-PX4 can set AP_Periph's remote parameters through its MAVLink Console. First
-enable PX4's manual DroneCAN sensor mode and reboot it as described in the PX4
-guide. In the console, run `uavcan status` and note the Matek node's current
-ID. Substitute that current ID for `10` below; it remains the command target
-while `CAN_NODE` is changed:
+Cross TX and RX at each sensor and share ground. For the SF45/B, connect its
+yellow TXD wire to CAN-G474 RX1, orange RXD to TX1, and ground to ground. Power
+the sensor from a suitable 5 V source. For the US-D1 UART version, connect its
+white radar-RX wire to TX4, green radar-TX wire to RX4, black to ground, and
+red to a suitable 5–13 V supply. Both sensors use 3.3 V UART logic; do not
+connect either sensor's power wire to a UART signal pin. UART1 is also used by
+the board's DFU update procedure, so disconnect the SF45/B from UART1 when
+using a USB-TTL adapter for DFU recovery.
 
-```text
-uavcan param set 10 CAN_NODE 42
-uavcan param set 10 CAN_BAUDRATE 1000000
-uavcan param set 10 PRX1_TYPE 8
-uavcan param set 10 PRX1_ADDR 0
-uavcan param set 10 PRX_PORT 3
-uavcan param set 10 PRX_BAUDRATE 921600
-uavcan param set 10 MSP_PORT -1
-uavcan param save 10
-```
+The long GPS connector carries UART2 and I2C2. GPS defaults to UART2
+(`GPS_PORT=2`) with automatic protocol detection (`GPS1_TYPE=1`); no exact GPS
+model is required for this default. The GPS-side I2C2 pins are available on
+that connector, but compass support is not enabled in this image.
 
-Choose an unused node ID instead of 42 if needed, and set PX4's `SF45C_NODE`
-to the same value. Keep the PX4 node ID different. `CAN_BAUDRATE` must match
-PX4's `UAVCAN_BITRATE` (normally 1000000). `PRX1_TYPE=8` selects AP's LightWare
-SF45/B proximity backend and `PRX1_ADDR=0` selects sensor instance 0.
-`PRX_BAUDRATE` must match the baud stored in SF45; 921600 matches the dedicated
-PX4 UART driver's default host rate if the sensor has not been configured to
-another value. `PRX_PORT=3` selects USART3. Save and power-cycle the CAN-G474
-after changing its node ID or UART settings.
+For the Matek ASPD-4525, connect its 5V, SCL, SDA, and ground wires to the
+CAN-G474 I2C1 connector. The sensor is the TE 4525DO-DS5AI001DP; AP_Periph
+defaults to `ARSPD_TYPE=1` and probes for it on the external I2C buses. I2C1
+is the first external bus in this board's mapping. The sensor requires a 4–5.5V
+supply. See Matek's [ASPD-4525 specifications and wiring](https://www.mateksys.com/?portfolio=aspd-4525).
 
-If the Matek node is not visible to PX4, configure it first with a USB-to-CAN
-adapter and DroneCAN GUI Tool. PX4's remote parameter commands are
-`uavcan param list <node-id>`, `uavcan param get <node-id> <name>`,
-`uavcan param set <node-id> <name> <value>`, and
-`uavcan param save <node-id>`.
+The SF45/B supports I2C commands, but its continuous scan stream is available
+only over UART, and this AP_Periph SF45 proximity backend is serial. I2C1 is
+therefore not a substitute for UART1 here. See LightWare's [SF45/B Product
+Guide](https://lightwarelidar.com/wp-content/uploads/2025/07/SF45B-Product-Guide-v3.pdf).
+The US-D1 must be the UART-output version for this wiring; the vendor also
+offers a CAN-output version. The [US-D1 technical manual](https://ainstein.ai/wp-content/uploads/US-D1-Technical-User-Manual-D00.02.05.docx.pdf)
+lists the UART wire colors, signal level, supply range, and baud rate.
 
-#### Optional Ainstein US-D1 on UART port 4
+The image enables the SF45/B proximity backend (`PRX1_TYPE=8`, sensor address
+0) on USART1 at 921600 baud and the US-D1 serial backend (`RNGFND1_TYPE=11`)
+on UART4 at 115200 baud. It sets `CAN_NODE=42` and `CAN_BAUDRATE=1000000`, so
+PX4's `SF45C_NODE` should be `42` and its `UAVCAN_BITRATE` should be
+`1000000`. Keep PX4's own node ID distinct from 42. With a connected, detected
+GPS or airspeed sensor, AP_Periph forwards its DroneCAN GPS or raw-air-data
+messages automatically as well.
 
-If the US-D1 is connected to port 4, enable its existing AP serial rangefinder
-backend before saving the node parameters:
+No AP_Periph parameter setup is needed after installing this image. The
+MatekG474-Periph target enables GPS, MS4525 airspeed, SF45/B proximity, and the
+US-D1 rangefinder. It compiles out compass, barometer, battery monitor, MSP,
+ADS-B, RC input, EFI, and unused airspeed backends. Its parameter format version
+is bumped for this configuration, so the first boot after updating erases saved
+AP_Periph parameters and applies the new defaults. This also resets any previous
+node ID or custom parameters to `CAN_NODE=42` and the sensor defaults above.
 
-```text
-uavcan param set 10 RNGFND1_TYPE 11
-uavcan param set 10 RNGFND_PORT 4
-```
-
-Replace `10` with the Matek node's current ID. The AP US-D1 backend uses
-115200 baud. These parameters are separate from the SF45 proximity settings.
-With PX4's UAVCAN sensor mode enabled, PX4 receives the US-D1 through its
-normal DroneCAN range-sensor bridge; no SF45-specific parameter configures it.
+PX4 still needs its receiver settings enabled as described in the PX4 guide.
+With its DroneCAN sensor bridge active, it receives the SF45 raw-sample
+messages and US-D1 range measurements automatically; the US-D1 does not use
+SF45-specific parameters.
 
 ### What differs from stock AP_Periph
 
@@ -229,12 +288,14 @@ with `flags=1`. Other proximity types retain their normal `flags=0` coarse
 boundary publication. This preserves individual scan angles instead of
 reducing them to AP's eight 45-degree boundary sectors.
 
-The SF45 backend requests update-rate code 6 (129 readings/s) and streams
-first-return distance and yaw. This rate is fixed in the backend; there is no
-AP_Periph rate parameter in this integration. Scan limits remain configured
-in the SF45 itself. AP_Periph also preserves the sender's 20 ms CAN transfer
-deadline when frames enter the HAL queue; other senders keep their default
-timeout.
+The SF45 backend now follows PX4's serial initialization sequence: it probes
+the product name, sends the update-rate and output-format settings one at a
+time after their acknowledgments, then enables streaming. It uses update-rate
+code 5 (500 readings/s in SF45/B Product Guide Rev. 3, matching PX4's default).
+The rate is fixed in the backend; there is no AP_Periph rate parameter in this
+integration. Scan limits remain configured in the SF45 itself. AP_Periph also
+preserves the sender's 20 ms CAN transfer deadline when frames enter the HAL
+queue; other senders keep their default timeout.
 
 `flags=1` is a paired AP/PX4 extension, not a standardized SF45 DroneCAN
 profile. A generic receiver that ignores the flag can treat sensor-frame yaw
