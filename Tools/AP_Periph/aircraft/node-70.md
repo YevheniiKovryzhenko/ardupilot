@@ -38,6 +38,8 @@ These values are embedded in the target's `defaults.parm`; the table also serves
 | `RNGFND_PORT` | 4 | US-D1 UART4 |
 | `RNGFND_BAUDRATE` | 115200 | US-D1 baud |
 | `RNGFND1_TYPE` | 11 | US-D1 serial backend |
+| `RNGFND1_MIN` | 0.5 | US-D1 minimum valid range, m |
+| `RNGFND1_MAX` | 50.0 | US-D1 maximum valid range, m |
 | `RNGFND_MAX_RATE` | 100 | Range publication rate limit, Hz |
 
 Set Here4's bitrate to 1 Mbit/s and verify its unique node ID separately; node 70's defaults do not configure another device. PX4 receiver settings are in [px4.md](px4.md).
@@ -86,6 +88,8 @@ Check `uavcan status` for node 70 and the independent Here4 ID, then follow the 
 - [US-D1 UART manual](https://ainstein.ai/wp-content/uploads/US-D1-Technical-User-Manual-D00.02.05.docx.pdf)
 
 ## Items to complete
+
+- [ ] Validate US-D1 readings against its 0.5–50 m specification and the manufacturer's SNR requirement (>13 dB); the existing UART driver does not implement SNR rejection. Saved range limits override the new preset.
 
 - [ ] Apply and read back the installation parameters on both AP_Periph and PX4; verify unique node IDs and both CAN segments.
 - [ ] Bench-test SF45/B, US-D1, and Here4 simultaneously, including data freshness, CAN errors, and disconnect/reconnect behavior.
