@@ -1,0 +1,18 @@
+# Spray actuators: three conventional PWM ESCs and two static valve outputs.
+include ../MatekG474/hwdef.inc
+USE_BOOTLOADER_FROM_BOARD MatekG474-Periph
+
+define HAL_PERIPH_CAN_MIRROR 1
+
+define AP_PERIPH_RC_OUT_ENABLED 1
+define AP_PERIPH_RELAY_ENABLED 1
+define AP_RELAY_ENABLED 1
+
+# Physical pads 1-3: one shared timer/rate for conventional PWM ESCs.
+PA0 TIM2_CH1 TIM2 PWM(1) GPIO(50)
+PA1 TIM2_CH2 TIM2 PWM(2) GPIO(51)
+PA2 TIM2_CH3 TIM2 PWM(3) GPIO(52)
+
+# Physical pads 5 and 6: GPIO only, not timer/PWM outputs.
+PA6 VALVE_1_EN OUTPUT LOW PUSHPULL GPIO(54)
+PA7 VALVE_2_EN OUTPUT LOW PUSHPULL GPIO(55)

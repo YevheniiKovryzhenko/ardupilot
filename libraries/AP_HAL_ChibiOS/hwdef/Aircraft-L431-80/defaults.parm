@@ -1,0 +1,4 @@
+# Spray sensor node; hardware allocation only, application telemetry pending.
+CAN_NODE 80
+CAN_BAUDRATE 1000000
+CAN_SLCAN_CPORT 0

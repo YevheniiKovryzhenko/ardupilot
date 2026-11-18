@@ -1,0 +1,19 @@
+# Spray sensing hardware target. Pressure/flow application telemetry pending.
+include ../MatekL431/hwdef.inc
+USE_BOOTLOADER_FROM_BOARD MatekL431
+
+# Curr pad: direct ADC input for the pressure current-loop shunt.
+define HAL_USE_ADC TRUE
+define STM32_ADC_USE_ADC1 TRUE
+PA1 SPRAY_PRESSURE ADC1 SCALE(1)
+
+# VB2 pad: already-divided battery sense from PM20S-2, nominal scale 26.
+PB0 BATTERY_VOLTAGE ADC1 SCALE(1)
+
+# Physical output pad 5 repurposed as an edge input. No PWM generation.
+PA15 FLOW_PULSE INPUT PULLDOWN GPIO(54)
+
+# No stock battery/RPM stream: spray data must not masquerade as either.
+define AP_PERIPH_BATTERY_ENABLED 0
+define AP_PERIPH_RPM_ENABLED 0
+define AP_PERIPH_RC_OUT_ENABLED 0

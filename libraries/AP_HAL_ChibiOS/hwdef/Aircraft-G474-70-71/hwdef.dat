@@ -1,0 +1,9 @@
+# Alternative combined avionics and spray-actuator image; CAN identity 70.
+include ../Aircraft-G474-70/hwdef.dat
+
+# Pads 5/6 must be static GPIO, not inherited TIM3 PWM outputs.
+undef PA6 PA7
+PA6 VALVE_1_EN OUTPUT LOW PUSHPULL GPIO(54)
+PA7 VALVE_2_EN OUTPUT LOW PUSHPULL GPIO(55)
+define AP_PERIPH_RELAY_ENABLED 1
+define AP_RELAY_ENABLED 1

@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="864pt" height="561.6pt" viewBox="0 0 864 561.6" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-11-17T19:54:10.045470</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.8, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 561.6 
+L 864 561.6 
+L 864 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 14.4 547.2 
+L 849.6 547.2 
+L 849.6 14.4 
+L 14.4 14.4 
+L 14.4 547.2 
+z
+" clip-path="url(#p07efb6faf2)" style="fill: none; stroke: #000000; stroke-width: 1.1; stroke-linejoin: miter"/>
+   </g>
+   <g id="line2d_1">
+    <path d="M 46.8 158.4 
+L 302.4 158.4 
+" clip-path="url(#p07efb6faf2)" style="fill: none; stroke: #000000; stroke-width: 1.8; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_2">
+    <path d="M 424.8 158.4 
+L 817.2 158.4 
+" clip-path="url(#p07efb6faf2)" style="fill: none; stroke: #000000; stroke-width: 1.8; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_3">
+    <path d="M 46.8 266.4 
+L 817.2 266.4 
+" clip-path="url(#p07efb6faf2)" style="fill: none; stroke: #000000; stroke-width: 1.8; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_4">
+    <path d="M 511.2 158.4 
+L 511.2 192.96 
+" clip-path="url(#p07efb6faf2)" style="fill: none; stroke: #000000; stroke-width: 1.8; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_5">
+    <path d="M 511.2 239.04 
+L 511.2 266.4 
+" clip-path="url(#p07efb6faf2)" style="fill: none; stroke: #000000; stroke-width: 1.8; stroke-linecap: square"/>
+   </g>
+   <g id="line2d_6">
+    <defs>
+     <path id="mcfdee5eee0" d="M 0 2.5 
+C 0.663008 2.5 1.29895 2.236584 1.767767 1.767767 
+C 2.236584 1.29895 2.5 0.663008 2.5 0 
+C 2.5 -0.663008 2.236584 -1.29895 1.767767 -1.767767 
+C 1.29895 -2.236584 0.663008 -2.5 0 -2.5 
+C -0.663008 -2.5 -1.29895 -2.236584 -1.767767 -1.767767 
+C -2.236584 -1.29895 -2.5 -0.663008 -2.5 0 
+C -2.5 0.663008 -2.236584 1.29895 -1.767767 1.767767 
+C -1.29895 2.236584 -0.663008 2.5 0 2.5 
+z
+" style="stroke: #000000"/>
+    </defs>
+    <g clip-path="url(#p07efb6faf2)">
+     <use xlink:href="#mcfdee5eee0" x="511.2" y="158.4" style="stroke: #000000"/>
+    </g>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 18px; font-family: 'DejaVu Sans'; text-anchor: middle" x="432" y="46.656562" transform="rotate(-0 432 46.656562)">FM838: assumed 12 V pulse signal to a digital input</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #444444" x="432" y="74.16" transform="rotate(-0 432 74.16)">Voltage divider • shared signal ground • resistors have no polarity</text>
+   </g>
+   <g id="patch_3">
+    <path d="M 302.4 175.68 
+L 424.8 175.68 
+L 424.8 141.12 
+L 302.4 141.12 
+z
+" clip-path="url(#p07efb6faf2)" style="fill: #ffffff; stroke: #000000; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 442.8 239.04 
+L 579.6 239.04 
+L 579.6 192.96 
+L 442.8 192.96 
+z
+" clip-path="url(#p07efb6faf2)" style="fill: #ffffff; stroke: #000000; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_3">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start" x="57.6" y="133.92" transform="rotate(-0 57.6 133.92)">Signal HIGH: assumed 12.0 V</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start" x="576" y="133.92" transform="rotate(-0 576 133.92)">Pad 5: HIGH ≈ 3.18 V</text>
+   </g>
+   <g id="text_5">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: start" x="57.6" y="249.12" transform="rotate(-0 57.6 249.12)">Sensor 0 V / node GND</text>
+   </g>
+   <g id="text_6">
+    <!-- $V_{node}=V_{signal}\,\frac{R_2}{R_1+R_2}$ -->
+    <g transform="translate(334.875 314.64)">
+     <text>
+      <tspan x="0" y="-0.674219" style="font-style: oblique; font-size: 21px; font-family: 'DejaVu Sans'">V</tspan>
+      <tspan x="77.403662" y="-0.674219" style="font-style: oblique; font-size: 21px; font-family: 'DejaVu Sans'">V</tspan>
+      <tspan x="14.365723" y="2.771094" style="font-style: oblique; font-size: 14.7px; font-family: 'DejaVu Sans'">n</tspan>
+      <tspan x="23.682422" y="2.771094" style="font-style: oblique; font-size: 14.7px; font-family: 'DejaVu Sans'">o</tspan>
+      <tspan x="32.676123" y="2.771094" style="font-style: oblique; font-size: 14.7px; font-family: 'DejaVu Sans'">d</tspan>
+      <tspan x="42.007178" y="2.771094" style="font-style: oblique; font-size: 14.7px; font-family: 'DejaVu Sans'">e</tspan>
+      <tspan x="91.769385" y="2.771094" style="font-style: oblique; font-size: 14.7px; font-family: 'DejaVu Sans'">s</tspan>
+      <tspan x="99.428027" y="2.771094" style="font-style: oblique; font-size: 14.7px; font-family: 'DejaVu Sans'">i</tspan>
+      <tspan x="103.512158" y="2.771094" style="font-style: oblique; font-size: 14.7px; font-family: 'DejaVu Sans'">g</tspan>
+      <tspan x="112.843213" y="2.771094" style="font-style: oblique; font-size: 14.7px; font-family: 'DejaVu Sans'">n</tspan>
+      <tspan x="122.159912" y="2.771094" style="font-style: oblique; font-size: 14.7px; font-family: 'DejaVu Sans'">a</tspan>
+      <tspan x="131.167969" y="2.771094" style="font-style: oblique; font-size: 14.7px; font-family: 'DejaVu Sans'">l</tspan>
+      <tspan x="139.23581" y="7.411719" style="font-style: oblique; font-size: 14.7px; font-family: 'DejaVu Sans'">R</tspan>
+      <tspan x="157.23581" y="-12.28125" style="font-style: oblique; font-size: 14.7px; font-family: 'DejaVu Sans'">R</tspan>
+      <tspan x="174.443315" y="7.411719" style="font-style: oblique; font-size: 14.7px; font-family: 'DejaVu Sans'">R</tspan>
+      <tspan x="55.71665" y="-0.674219" style="font-size: 21px; font-family: 'DejaVu Sans'">=</tspan>
+      <tspan x="149.449726" y="9.823437" style="font-size: 10.29px; font-family: 'DejaVu Sans'">1</tspan>
+      <tspan x="167.449726" y="-9.869531" style="font-size: 10.29px; font-family: 'DejaVu Sans'">2</tspan>
+      <tspan x="184.657231" y="9.823437" style="font-size: 10.29px; font-family: 'DejaVu Sans'">2</tspan>
+      <tspan x="159.262407" y="7.411719" style="font-size: 14.7px; font-family: 'DejaVu Sans'">+</tspan>
+     </text>
+     <rect x="139.23581" y="-5.619531" width="52.370186" height="1.3125"/>
+    </g>
+   </g>
+   <g id="text_7">
+    <!-- $12.0\,V\times\frac{3.6\,k\Omega}{10\,k\Omega+3.6\,k\Omega}=3.18\,V$ -->
+    <g transform="translate(281.3 375.84)">
+     <text>
+      <tspan x="0" y="-0.445312" style="font-size: 22px; font-family: 'DejaVu Sans'">1</tspan>
+      <tspan x="13.99707" y="-0.445312" style="font-size: 22px; font-family: 'DejaVu Sans'">2</tspan>
+      <tspan x="27.994141" y="-0.445312" style="font-size: 22px; font-family: 'DejaVu Sans'">.</tspan>
+      <tspan x="34.987305" y="-0.445312" style="font-size: 22px; font-family: 'DejaVu Sans'">0</tspan>
+      <tspan x="71.892161" y="-0.445312" style="font-size: 22px; font-family: 'DejaVu Sans'">×</tspan>
+      <tspan x="211.012183" y="-0.445312" style="font-size: 22px; font-family: 'DejaVu Sans'">=</tspan>
+      <tspan x="233.73191" y="-0.445312" style="font-size: 22px; font-family: 'DejaVu Sans'">3</tspan>
+      <tspan x="247.72898" y="-0.445312" style="font-size: 22px; font-family: 'DejaVu Sans'">.</tspan>
+      <tspan x="254.722144" y="-0.445312" style="font-size: 22px; font-family: 'DejaVu Sans'">1</tspan>
+      <tspan x="268.719214" y="-0.445312" style="font-size: 22px; font-family: 'DejaVu Sans'">8</tspan>
+      <tspan x="52.556224" y="-0.445312" style="font-style: oblique; font-size: 22px; font-family: 'DejaVu Sans'">V</tspan>
+      <tspan x="286.288134" y="-0.445312" style="font-style: oblique; font-size: 22px; font-family: 'DejaVu Sans'">V</tspan>
+      <tspan x="94.611888" y="8.5" style="font-size: 15.4px; font-family: 'DejaVu Sans'">1</tspan>
+      <tspan x="104.409837" y="8.5" style="font-size: 15.4px; font-family: 'DejaVu Sans'">0</tspan>
+      <tspan x="125.611888" y="-10.296875" style="font-size: 15.4px; font-family: 'DejaVu Sans'">3</tspan>
+      <tspan x="125.626244" y="8.5" style="font-size: 15.4px; font-family: 'DejaVu Sans'">Ω</tspan>
+      <tspan x="135.409837" y="-10.296875" style="font-size: 15.4px; font-family: 'DejaVu Sans'">.</tspan>
+      <tspan x="140.305052" y="-10.296875" style="font-size: 15.4px; font-family: 'DejaVu Sans'">6</tspan>
+      <tspan x="140.394604" y="8.5" style="font-size: 15.4px; font-family: 'DejaVu Sans'">+</tspan>
+      <tspan x="156.298412" y="8.5" style="font-size: 15.4px; font-family: 'DejaVu Sans'">3</tspan>
+      <tspan x="161.521459" y="-10.296875" style="font-size: 15.4px; font-family: 'DejaVu Sans'">Ω</tspan>
+      <tspan x="166.096362" y="8.5" style="font-size: 15.4px; font-family: 'DejaVu Sans'">.</tspan>
+      <tspan x="170.991577" y="8.5" style="font-size: 15.4px; font-family: 'DejaVu Sans'">6</tspan>
+      <tspan x="192.207984" y="8.5" style="font-size: 15.4px; font-family: 'DejaVu Sans'">Ω</tspan>
+      <tspan x="116.70808" y="8.5" style="font-style: oblique; font-size: 15.4px; font-family: 'DejaVu Sans'">k</tspan>
+      <tspan x="152.603295" y="-10.296875" style="font-style: oblique; font-size: 15.4px; font-family: 'DejaVu Sans'">k</tspan>
+      <tspan x="183.28982" y="8.5" style="font-style: oblique; font-size: 15.4px; font-family: 'DejaVu Sans'">k</tspan>
+     </text>
+     <rect x="94.611888" y="-5.578125" width="109.364163" height="1.375"/>
+    </g>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 13px; font-family: 'DejaVu Sans'; text-anchor: middle" x="432" y="429.12" transform="rotate(-0 432 429.12)">The pulse remains digital: LOW ≈ 0 V; count rising edges, not ADC samples.</text>
+   </g>
+   <g id="text_9">
+    <text style="font-size: 12px; font-family: 'DejaVu Sans'; text-anchor: middle" x="432" y="475.92" transform="rotate(-0 432 475.92)">Conditional example: measure actual HIGH / LOW levels and maximum voltage first.</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 11px; font-family: 'DejaVu Sans'; text-anchor: middle; fill: #444444" x="432" y="515.52" transform="rotate(-0 432 515.52)">At 14 V input this divider gives 3.71 V: not suitable if the signal can reach that voltage.</text>
+   </g>
+   <g id="text_11">
+    <!-- $R_1 = 10\,k\Omega$ -->
+    <g transform="translate(329.93 161.987187)">
+     <text>
+      <tspan x="0" y="-0.125" style="font-style: oblique; font-size: 13px; font-family: 'DejaVu Sans'">R</tspan>
+      <tspan x="49.788519" y="-0.125" style="font-style: oblique; font-size: 13px; font-family: 'DejaVu Sans'">k</tspan>
+      <tspan x="9.032715" y="2.007812" style="font-size: 9.1px; font-family: 'DejaVu Sans'">1</tspan>
+      <tspan x="17.710596" y="-0.125" style="font-size: 13px; font-family: 'DejaVu Sans'">=</tspan>
+      <tspan x="31.135889" y="-0.125" style="font-size: 13px; font-family: 'DejaVu Sans'">1</tspan>
+      <tspan x="39.406885" y="-0.125" style="font-size: 13px; font-family: 'DejaVu Sans'">0</tspan>
+      <tspan x="57.316839" y="-0.125" style="font-size: 13px; font-family: 'DejaVu Sans'">Ω</tspan>
+     </text>
+    </g>
+   </g>
+   <g id="text_12">
+    <!-- $R_2 = 3.6\,k\Omega$ -->
+    <g transform="translate(475.45 219.587187)">
+     <text>
+      <tspan x="0" y="-0.125" style="font-style: oblique; font-size: 13px; font-family: 'DejaVu Sans'">R</tspan>
+      <tspan x="53.920843" y="-0.125" style="font-style: oblique; font-size: 13px; font-family: 'DejaVu Sans'">k</tspan>
+      <tspan x="9.032715" y="2.007812" style="font-size: 9.1px; font-family: 'DejaVu Sans'">2</tspan>
+      <tspan x="17.710596" y="-0.125" style="font-size: 13px; font-family: 'DejaVu Sans'">=</tspan>
+      <tspan x="31.135889" y="-0.125" style="font-size: 13px; font-family: 'DejaVu Sans'">3</tspan>
+      <tspan x="39.406885" y="-0.125" style="font-size: 13px; font-family: 'DejaVu Sans'">.</tspan>
+      <tspan x="43.539209" y="-0.125" style="font-size: 13px; font-family: 'DejaVu Sans'">6</tspan>
+      <tspan x="61.449163" y="-0.125" style="font-size: 13px; font-family: 'DejaVu Sans'">Ω</tspan>
+     </text>
+    </g>
+   </g>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p07efb6faf2">
+   <rect x="0" y="0" width="864" height="561.6"/>
+  </clipPath>
+ </defs>
+</svg>
